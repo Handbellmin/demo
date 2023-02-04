@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class MainController {
     @GetMapping("/")
     public void main(){
-        System.out.println("Test Connect");
+        System.out.println("Test Connect docker-jenkinks");
 
     }
 }
