@@ -1,4 +1,12 @@
-port: 9000
+server:
+  port: 9000
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
 spring:
   datasource:
     url: jdbc:h2:tcp://localhost/~/hello-spring/demo;
@@ -8,13 +16,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update #create update none
     properties:
       hibernate:
-#        show_sql: true
-        format_sql: true
-
+       show_sql: true
+      #format_sql: true
+    naming:
+      physical-strategy:org.hibernater.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
 logging:
   level:
     org.hibernate.SQL: debug
+
+jwt:
+  secret: demoApplication_v3
