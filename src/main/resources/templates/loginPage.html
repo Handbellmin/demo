@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Login Page</h1>
+<form>
+    <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" required autofocus />
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required />
+    </div>
+    <button type="button" id="login-btn">Login</button>
+</form>
+
+<script>
+        $(function() {
+            $('#login-btn').click(function() {
+                var username = $('#username').val();
+                var password = $('#password').val();
+                var data = { "username": username, "password": password };
+                $.ajax({
+                    url: '/login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(result) {
+                        alert(result.message);
+                    },
+                    error: function(xhr, status, error) {
+                        alert(xhr.responseJSON.message);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

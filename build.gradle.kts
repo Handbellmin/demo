@@ -18,17 +18,17 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("junit:junit:4.13.1")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	// https://mvnrepository.com/artifact/org.thymeleaf/thymeleaf
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-devtools")
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.7.5")
-	// https://mvnrepository.com/artifact/org.eclipse.dirigible/dirigible-database-h2
 	implementation("org.eclipse.dirigible:dirigible-database-h2:6.3.23")
-	// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	implementation("mysql:mysql-connector-java:8.0.28")
+	implementation("org.springframework.boot:spring-boot-starter-security:2.7.6")
+	implementation("com.auth0:java-jwt:3.10.3")
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor ("org.projectlombok:lombok")
 	runtimeOnly("com.h2database:h2")
+	implementation("io.jsonwebtoken:jjwt:0.9.1")
 
 }
 
