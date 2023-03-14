@@ -10,6 +10,7 @@ import com.example.demo.auth.PrincipalDetails;
 import com.example.demo.model.Users;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UserRepository userRepository;
 
+    private JwtTokenService jwtTokenService;
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -40,40 +43,46 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         System.out.println("인증이나 권한이 필요한 주소 요청이 됨.");
-
-        String jwtHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        System.out.println("jwtHeader :" + jwtHeader);
-
+        String jwtHaeader_access = request.getHeader("AccessToken");
+        String jwtHaeader_refresh = request.getHeader("refreshToken");
+        //String jwtHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         // header 가 있는지 확인
-        if(jwtHeader == null || !jwtHeader.startsWith("Bearer ")){
+        /*if(jwtHeader == null || !jwtHeader.startsWith("Bearer ")){
             chain.doFilter(request,response);
             return;
-        }
-        // JWT 토큰을 검증해서 정상적인 사용자인지 확인
-        String jwtToken = request.getHeader("Authorization").replace("Bearer ", "");
-        String username =
-                JWT.require(Algorithm.HMAC512("demoApplication_v3")).build().verify(jwtToken).getClaim("username").asString();
+        }*/
+        //access Token 이  null 이면 refreshToken을 확인한다.
+        if(jwtHaeader_access == null) {
+            System.out.println("jwtHeader_access is null.");
+        }else {
+            System.out.println("jwtHeader_access is not null.");
+            // JWT 토큰을 검증해서 정상적인 사용자인지 확인
+            //String jwtToken = request.getHeader("Authorization").replace("Bearer ", "");
+        /*String username =
+                JWT.require(Algorithm.HMAC512("demoApplication_v3")).build().verify(jwtToken).getClaim("username").asString();*/
 
-        //Token Expired
-        if (JwtUtil.isExpired(jwtToken, secretKey)) {
-            chain.doFilter(request,response);
-            return;
-        }
-        String userName = JwtUtil.getUserName(jwtToken, secretKey);
-        // 서명이 정상적으로 됨
-        if(username != null) {
-            System.out.println("________________________________");
-            Users userEntity = userRepository.findByUsername(username);
+            //Token Expired
+            if (JwtUtil.isExpired(jwtHaeader_access, "demoApplicationv3")) {
+                chain.doFilter(request, response);
+                return;
+            }
+            String userName = JwtUtil.getUserName(jwtHaeader_access, "demoApplicationv3");
+            System.out.println("userName :" + userName);
+            // 서명이 정상적으로 됨
+            if (userName != null) {
+                System.out.println("________________________________");
+                Users userEntity = userRepository.findByUsername(userName);
 
-            PrincipalDetails principalDetails = new PrincipalDetails(userEntity);
-            
-            //Jwt 토큰 서명을 통해서 서명이 정상이면 Authentication 객체를 만들어준다.
-            Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(principalDetails,null, principalDetails.getAuthorities());
-            //Security를 저장할 수 있는 세션 공간 -> 강제로 시큐리티의 세션에 접근하여 Authentication 객체를 저장
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                PrincipalDetails principalDetails = new PrincipalDetails(userEntity);
+
+                //Jwt 토큰 서명을 통해서 서명이 정상이면 Authentication 객체를 만들어준다.
+                Authentication authentication =
+                        new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
+                //Security를 저장할 수 있는 세션 공간 -> 강제로 시큐리티의 세션에 접근하여 Authentication 객체를 저장
+                SecurityContextHolder.getContext().setAuthentication(authentication);
 
 
+            }
         }
         chain.doFilter(request,response);
     }

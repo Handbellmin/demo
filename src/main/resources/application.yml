@@ -29,4 +29,4 @@ logging:
     org.hibernate.SQL: debug
 
 jwt:
-  secret: demoApplication_v3
+  secret: demoApplicationv3

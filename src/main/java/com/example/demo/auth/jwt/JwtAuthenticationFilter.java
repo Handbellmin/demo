@@ -11,7 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,11 +20,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 //스프링 시큐리티에 있는 필터 (UsernamePasswordAuthenticationFilter)
 // /login 요청을 할때, username, password 전송하면 이 필터 동작
@@ -39,7 +35,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // JWT 토큰을 만들어서 request요청한 사용자에게 JWT토른을 response해줌
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-
+        JwtTokenService jwtTokenService = new JwtTokenService();
         System.out.println("successfulAuthentication 실행");
         PrincipalDetails principalDetails = (PrincipalDetails)authResult.getPrincipal();
 
@@ -50,11 +46,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                         .withClaim("username",principalDetails.getUser().getUsername())
                                                 .sign(Algorithm.HMAC512("demoApplicationv3"));
         //로그인된 사용자에게 전해주는 응답헤더
+
+        String accessToken = jwtTokenService.createAccessToken(principalDetails.getUser().getUsername());
+        String refreshToken = jwtTokenService.createRefreshToken(principalDetails.getUser().getUsername());
         response.addHeader("Authorization","Bearer "+jwtToken);
-        setHttpOnlyCookie(response,"Authorization","Bearer",100);
+        response.addHeader("AccessToken",accessToken);
+        response.addHeader("refreshToken",accessToken);
+        response.getWriter().write("AccessToken "+ accessToken);
+        //Access Token 생성 후 클라이언트 쿠키에 access token 을 담는다.
+        setHttpOnlyCookie(response,"AccessToken",accessToken,100);
+        //refresh Token 생성 후 클라이언트 쿠키에 refresh token 을 담는다.
+        setHttpOnlyCookie(response,"refreshToken",refreshToken,100);
+        //setHttpOnlyCookie(response,"Authorization","Bearer",100);
         String targetUrl = determineTargetUrl(request,authResult);
 
-        //redirectStrategy.sendRedirect(request,response,targetUrl);
+        redirectStrategy.sendRedirect(request,response,targetUrl);
     }
     public void setHttpOnlyCookie(HttpServletResponse response, String name, String value, int maxAgeInSeconds) {
         Cookie cookie = new Cookie(name, value);
