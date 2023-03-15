@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +36,7 @@ public class RestApiController {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationManagerBuilder authenticationManager;
 
     private final PrincipalDetailsService principalDetailsService;
     private final JwtTokenService jwtTokenService;
@@ -56,9 +57,6 @@ public class RestApiController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Users user, HttpServletResponse response){
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
-            );
 
             PrincipalDetails principalDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(user.getUsername());
             String accessToken = jwtTokenService.createAccessToken(user.getUsername());

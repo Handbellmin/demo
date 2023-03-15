@@ -30,15 +30,15 @@ public class SecurityConfig {
                 .and()
                 .formLogin().disable()
                 .httpBasic().disable()
-                .authorizeRequests(authroize -> authroize.antMatchers("/api/v1/user/**")
+                /*.authorizeRequests(authroize -> authroize.antMatchers("/api/v1/user/**")
                         .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                         .antMatchers("/api/v1/manager/**")
                         .access("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
                         .antMatchers("/api/v1/admin/**")
                         .access("hasRole('ROLE_ADMIN')")
                         .anyRequest().permitAll())
-                .apply(new MyCustomDsl()) //커스텀 필터
-                .and()
+                .apply(new MyCustomDsl()) //커스텀 필터*/
+                //.and()
                 .build();
     }
     public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurity> {

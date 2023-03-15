@@ -3,11 +3,12 @@ package com.example.demo.auth.jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-
+@Service
 public class JwtTokenService {
     @Value ("${jwt.secret}")
     private String secretKey;
